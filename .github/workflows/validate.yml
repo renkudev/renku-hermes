@@ -8,5 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 -m py_compile scripts/*.py
+      - run: python3 -m unittest discover -s tests -p "test_*.py"
       - run: python3 -m json.tool recipe.json > /dev/null
       - run: swift package dump-package > /dev/null
