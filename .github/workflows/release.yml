@@ -1,0 +1,31 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Immutable distribution version (major.minor.patch)
+        required: true
+        default: 0.1.0
+permissions:
+  contents: write
+concurrency:
+  group: release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: xcode-27
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: python3 scripts/release.py "$RELEASE_VERSION"
+      - name: Verify anonymous SwiftPM consumption
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: python3 scripts/consume.py "$RELEASE_VERSION"

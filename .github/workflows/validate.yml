@@ -1,0 +1,12 @@
+name: Validate
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m py_compile scripts/*.py
+      - run: python3 -m json.tool recipe.json > /dev/null
+      - run: swift package dump-package > /dev/null
