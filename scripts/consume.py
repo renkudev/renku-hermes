@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='hermes-consumer-') as temp:
 import PackageDescription
 let package = Package(name: "Probe", platforms: [.macOS("27.0")],
     dependencies: [.package(url: "https://github.com/renkudev/renku-hermes.git", exact: "{version}")],
-    targets: [.executableTarget(name: "Probe", dependencies: [.product(name: "hermesvm", package: "renku-hermes")])],
+    targets: [.executableTarget(name: "Probe", dependencies: [.product(name: "hermesvm", package: "renku-hermes")], linkerSettings: [.unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path"])])],
     cxxLanguageStandard: .cxx20)
 ''')
     source = folder / 'Sources/Probe'

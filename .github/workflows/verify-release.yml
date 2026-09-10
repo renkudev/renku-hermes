@@ -1,0 +1,19 @@
+name: Verify published release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing version to download and test (no publication)
+        required: true
+        default: 0.1.0
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify anonymous consumption
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: python3 scripts/consume.py "$RELEASE_VERSION"
