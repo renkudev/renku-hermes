@@ -33,10 +33,10 @@ let package = Package(name: "Probe", platforms: [.macOS("27.0")],
     source = folder / 'Sources/Probe'
     source.mkdir(parents=True)
     (source / 'main.cpp').write_bytes((ROOT / 'tests/run.cpp').read_bytes())
-    subprocess.run(['swift', 'build', '--package-path', folder], check=True)
+    subprocess.run(['swift', 'build', '--disable-keychain', '--disable-netrc', '--package-path', folder], check=True)
     subprocess.run(['tar', '-xzf', folder / 'hermesc-macos-arm64.tar.gz', '-C', folder], check=True)
     hbc = folder / 'test.hbc'
     subprocess.run([folder / 'host/bin/hermesc', '-O', '-emit-binary', '-out', hbc, ROOT / 'tests/ownership.js'], check=True)
-    bindir = subprocess.check_output(['swift', 'build', '--package-path', folder, '--show-bin-path'], text=True).strip()
+    bindir = subprocess.check_output(['swift', 'build', '--disable-keychain', '--disable-netrc', '--package-path', folder, '--show-bin-path'], text=True).strip()
     subprocess.run([Path(bindir) / 'Probe', hbc], check=True)
 print('Anonymous release consumption passed')

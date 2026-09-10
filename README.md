@@ -30,7 +30,9 @@ prepares draft assets, commits a manifest containing their checksums, tags, publ
 verifies anonymous SwiftPM consumption. Published tags and assets are never overwritten.
 Interrupted drafts may resume only with matching source/artifact metadata. Inspect a partial
 upload rather than replacing assets blindly. A published correction always receives a new version.
-After publication, adopt the release explicitly in renku and run its native acceptance.
+To recheck an existing release, run the read-only Verify published release workflow; it never
+changes tags or assets. After publication, adopt the release explicitly in renku and run its
+native acceptance.
 
 Hermes source and packaged notices retain the upstream MIT license. The build downloads only
 that pinned source; no upstream history is vendored into this repository.
