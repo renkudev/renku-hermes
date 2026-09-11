@@ -4,13 +4,8 @@
   "hbcVersion": 99,
   "minimumOS": "27.0",
   "architecture": "arm64",
-  "adaptation": {
-    "version": 1,
-    "path": "lib/InternalJavaScript/01-Promise.js",
-    "upstreamSha256": "e1af6ee6367bd5fce4f36cac795962cd252a360f0b6bd56f119d47f4b8437599"
-  },
-  "version": "0.1.0",
-  "sourceCommit": "ae6a98a2de0c69dfb69f753bfd2933b6401882fc",
+  "version": "0.2.0",
+  "sourceCommit": "04d699066b271495a319406b763a73bb9575f795",
   "xcode": "Xcode 27.0\nBuild version 27A5252f",
   "clang": "Apple clang version 21.0.0 (clang-2100.3.33.1)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode_27_beta_6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin",
   "sdks": {
@@ -20,7 +15,7 @@
   },
   "runnerImage": "20260907.0173.1",
   "artifacts": {
-    "hermesvm.xcframework.zip": "61ab82314a0a23e4db5831fe833563388406604dcc421d2ea2fb014d1000f4d8",
-    "hermesc-macos-arm64.tar.gz": "4d1fef36a00e5c484e39e5984e2e06c71c9c99d8e1acc8d0aef6869f324eacf3"
+    "hermesvm.xcframework.zip": "3610b2d2ed02640bfa84d2d6a7c9d68a296a0548738b06b9b9c894e85371b975",
+    "hermesc-macos-arm64.tar.gz": "6b342b666e55ac7ada52ac3673f2294c37ac139b481d95bb4a73e5f842428c55"
   }
 }
