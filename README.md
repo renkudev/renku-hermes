@@ -1,14 +1,14 @@
 # renku-hermes
 
 The Hermes compiler and Apple runtime distribution maintained for renku. This is not an
-upstream Hermes release. The engine retains a small Promise reaction adaptation for renku's
-native async ownership; it does not add async/await support to Hermes.
+upstream Hermes release. The engine source is unpatched. Application ownership and cancellation belong to consumers;
+compiler/runtime packaging and bytecode verification remain matched.
 
 ## Consume a release
 
 Use the exact tagged Swift package version and the `hermesvm` product. Download the matching
 `hermesc-macos-arm64.tar.gz` release asset, verify its SHA-256 in the pinned release metadata,
-and run `host/bin/hermesc -O -emit-binary -out app.hbc app.js`. Do not mix release identities.
+and run `host/bin/hermesc -Xes6-block-scoping -O -emit-binary -out app.hbc app.js`. Do not mix release identities.
 The compiler runs on macOS 27 arm64. Runtime slices support iOS 27 devices/simulators and macOS
 27 arm64. Import C++ headers through `<hermesvm/hermes/hermes.h>` and `<hermesvm/jsi/jsi.h>`.
 
@@ -25,7 +25,7 @@ here first, then commit the submodule pointer in the parent. Its build never rea
 ## Release
 
 Run the Release workflow manually from main with a new major.minor.patch version, initially
-`0.1.0`. It builds on hosted arm64 Xcode 27, verifies actual bytecode/ownership and headers,
+`0.1.0`. It builds on hosted arm64 Xcode 27, verifies actual bytecode/async behavior and headers,
 prepares draft assets, commits a manifest containing their checksums, tags, publishes, and
 verifies anonymous SwiftPM consumption. Published tags and assets are never overwritten.
 Interrupted drafts may resume only with matching source/artifact metadata. Inspect a partial

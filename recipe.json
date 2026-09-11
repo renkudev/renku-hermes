@@ -3,10 +3,5 @@
   "revision": "5cee10abc93667ea5538caecaf0a457c66fa5bdc",
   "hbcVersion": 99,
   "minimumOS": "27.0",
-  "architecture": "arm64",
-  "adaptation": {
-    "version": 1,
-    "path": "lib/InternalJavaScript/01-Promise.js",
-    "upstreamSha256": "e1af6ee6367bd5fce4f36cac795962cd252a360f0b6bd56f119d47f4b8437599"
-  }
+  "architecture": "arm64"
 }

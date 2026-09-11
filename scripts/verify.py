@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify packaged public headers, linkage, bytecode, and patched async ownership."""
+"""Verify packaged public headers, linkage, bytecode, and unpatched async behavior."""
 from pathlib import Path
 import plistlib
 import subprocess
@@ -23,11 +23,11 @@ def main():
     subprocess.run(['xcrun', 'clang++', '-std=c++20', '-mmacosx-version-min=27.0',
                     '-F', framework, ROOT / 'tests/run.cpp', '-framework', 'hermesvm',
                     '-Wl,-rpath,' + str(framework), '-o', runner], check=True)
-    hbc = out / 'ownership.hbc'
-    subprocess.run([compiler, '-O', '-emit-binary', '-out', hbc, ROOT / 'tests/ownership.js'], check=True)
+    hbc = out / 'async.hbc'
+    subprocess.run([compiler, '-Xes6-block-scoping', '-O', '-emit-binary', '-out', hbc, ROOT / 'tests/async.js'], check=True)
     assert int.from_bytes(hbc.read_bytes()[8:12], 'little') == 99
     output = subprocess.check_output([runner, hbc], text=True)
-    assert 'renku-hermes ownership and Intl passed' in output, output
+    assert 'renku-hermes unpatched async and Intl passed' in output, output
     print(output)
 
 if __name__ == '__main__':

@@ -60,25 +60,8 @@ def main():
         run('git', '-C', source, 'checkout', '--detach', 'FETCH_HEAD')
     if run('git', '-C', source, 'rev-parse', 'HEAD', capture=True) != recipe['revision']:
         raise RuntimeError('Unexpected source revision; remove the owned build directory and retry')
-    adaptation = recipe['adaptation']
-    path = source / adaptation['path']
-    original = run('git', '-C', source, 'show', f"HEAD:{adaptation['path']}", capture=True) + '\n'
-    if hashlib.sha256(original.encode()).hexdigest() != adaptation['upstreamSha256']:
-        raise RuntimeError('Pinned upstream Promise hash mismatch')
-    anchor = '      this.promise = promise;'
-    if original.count(anchor) != 1:
-        raise RuntimeError('Promise adaptation anchor mismatch')
-    adapted = original.replace(anchor, anchor + '''
-      if (typeof globalThis.__renkuBindAsync === 'function') {
-        this.onFulfilled = globalThis.__renkuBindAsync(this.onFulfilled);
-        this.onRejected = globalThis.__renkuBindAsync(this.onRejected);
-      }''')
-    changed = run('git', '-C', source, 'diff', '--name-only', capture=True).splitlines()
-    if changed not in ([], [adaptation['path']]) or run('git', '-C', source, 'ls-files', '--others', '--exclude-standard', capture=True):
-        raise RuntimeError('Unexpected changes in owned upstream source')
-    if path.read_text() not in (original, adapted):
-        raise RuntimeError('Unexpected Promise source modifications')
-    path.write_text(adapted)
+    if run('git', '-C', source, 'status', '--porcelain', capture=True):
+        raise RuntimeError('Expected an unchanged pinned upstream source checkout')
     cc = run('xcrun', '--find', 'clang', capture=True)
     cxx = run('xcrun', '--find', 'clang++', capture=True)
     common = ['-G', 'Ninja', f'-DCMAKE_C_COMPILER={cc}', f'-DCMAKE_CXX_COMPILER={cxx}',

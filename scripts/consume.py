@@ -36,7 +36,10 @@ let package = Package(name: "Probe", platforms: [.macOS("27.0")],
     subprocess.run(['swift', 'build', '--disable-keychain', '--disable-netrc', '--package-path', folder], check=True)
     subprocess.run(['tar', '-xzf', folder / 'hermesc-macos-arm64.tar.gz', '-C', folder], check=True)
     hbc = folder / 'test.hbc'
-    subprocess.run([folder / 'host/bin/hermesc', '-O', '-emit-binary', '-out', hbc, ROOT / 'tests/ownership.js'], check=True)
+    subprocess.run([folder / 'host/bin/hermesc', '-Xes6-block-scoping', '-O', '-emit-binary', '-out', hbc, ROOT / 'tests/async.js'], check=True)
     bindir = subprocess.check_output(['swift', 'build', '--disable-keychain', '--disable-netrc', '--package-path', folder, '--show-bin-path'], text=True).strip()
-    subprocess.run([Path(bindir) / 'Probe', hbc], check=True)
+    result = subprocess.run([Path(bindir) / 'Probe', hbc], check=True, capture_output=True, text=True)
+    print(result.stdout, end='')
+    if 'renku-hermes unpatched async and Intl passed' not in result.stdout:
+        raise RuntimeError('Consumer did not complete async bytecode assertions')
 print('Anonymous release consumption passed')
