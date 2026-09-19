@@ -1,0 +1,5 @@
+module RenkuHermesNative {
+  header "RenkuHermesNative.h"
+  requires cplusplus
+  export *
+}
