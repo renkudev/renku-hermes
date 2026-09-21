@@ -55,6 +55,19 @@ EvaluationResult RuntimeSession::load(const uint8_t *bytes, size_t size) noexcep
     return {false, {}, "Unknown Hermes runtime error"};
   }
 }
+EvaluationResult RuntimeSession::drainMicrotasks() noexcept {
+  try {
+    if (!state_->runtime) return {false, {}, "Hermes session is not loaded"};
+    state_->runtime->drainMicrotasks();
+    return {true, {}, {}};
+  } catch (const facebook::jsi::JSError &error) {
+    return {false, {}, error.what()};
+  } catch (const std::exception &error) {
+    return {false, {}, error.what()};
+  } catch (...) {
+    return {false, {}, "Unknown Hermes microtask error"};
+  }
+}
 EvaluationResult RuntimeSession::call(const std::string &functionName,
                                      const std::string &argument) noexcept {
   return invoke(functionName, &argument);

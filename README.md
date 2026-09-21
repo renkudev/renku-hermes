@@ -28,11 +28,15 @@ Build the artifacts before resolving the package. Git intentionally excludes
 ## Interface
 
 ```swift
+import Foundation
 import RenkuHermes
 
 let session = try HermesSession(bytecodeAt: url) // MainActor
 let snapshot = try session.call("renkuMount")
-let updated = try session.call("renkuDispatch", argument: eventID)
+let event = String(decoding: try JSONEncoder().encode(["event": eventID]), as: UTF8.self)
+let updated = try session.call("renkuDispatch", argument: event)
+try session.drainMicrotasks()
+let turn = try session.call("renkuFlush") // Current snapshot and queued requests
 ```
 
 `HermesSession` loads bytecode once and keeps JavaScript state across calls. Calls
@@ -44,10 +48,11 @@ Bytecode is copied into owned storage and validated before execution.
 JavaScript and recoverable C++ errors become `HermesError`. C++ exceptions are
 caught before reaching Swift, and the runtime outlives any exception retaining JS
 values. Fatal engine errors and allocation failures are not generally recoverable.
-The public C++ header contains no JSI types. This is a synchronous bytecode host;
-networking, timers, downloaded module loading, and an asynchronous event loop are
-future additions. Downloadable application assets must target the installed
-runtime contract; this lean runtime does not evaluate browser ESM source.
+The public C++ header contains no JSI types. Calls are synchronous, with an explicit
+`session.drainMicrotasks()` checkpoint for promise continuations. Renku’s SwiftUI host pumps these checkpoints after
+events and URLSession server-function responses. Timers and downloaded module
+loading remain future additions. Downloadable application assets must target the
+installed runtime contract; this lean runtime does not evaluate browser ESM source.
 
 Set `RENKU_TEST_HBC` to the generated docs app's `app.hbc` when running Swift tests
 to also verify compiled Renku components, signals, events, and structural updates.

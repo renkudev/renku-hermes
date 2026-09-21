@@ -18,6 +18,7 @@ class RuntimeSession {
   EvaluationResult invoke(const std::string &functionName, const std::string *argument) noexcept;
  public:
   RuntimeSession();
+  EvaluationResult drainMicrotasks() noexcept;
   EvaluationResult load(const uint8_t *bytes, size_t size) noexcept;
   EvaluationResult callWithoutArguments(const std::string &functionName) noexcept;
   EvaluationResult call(const std::string &functionName, const std::string &argument) noexcept;

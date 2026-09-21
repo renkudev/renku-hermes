@@ -59,6 +59,15 @@ final class HermesRuntimeTests: XCTestCase {
     }
 
     @MainActor
+    func testMicrotaskCheckpoints() throws {
+        let hbc = try compile("var result = 'pending'; globalThis.start = function () { Promise.resolve(2).then(function (v) { return v + 3; }).then(function (v) { result = String(v); }); return result; }; globalThis.read = function () { return result; };")
+        let session = try HermesSession(bytecode: hbc)
+        XCTAssertEqual(try session.call("start"), "pending")
+        try session.drainMicrotasks()
+        XCTAssertEqual(try session.call("read"), "5")
+    }
+
+    @MainActor
     func testCompiledRenkuApp() throws {
         guard let path = ProcessInfo.processInfo.environment["RENKU_TEST_HBC"] else {
             throw XCTSkip("Set RENKU_TEST_HBC to a generated docs app bundle")
@@ -74,10 +83,10 @@ final class HermesRuntimeTests: XCTestCase {
         }
         let nodes = try allNodes(initial)
         let button = nodes.first { ($0["props"] as? [String: Any])?["testID"] as? String == "increment" }!
-        let changed = try session.call("renkuDispatch", argument: button["event"] as! String)
+        let changed = try session.call("renkuDispatch", argument: String(decoding: try JSONSerialization.data(withJSONObject: ["event": button["event"] as! String]), as: UTF8.self))
         XCTAssertTrue(try allNodes(changed).contains { $0["text"] as? String == "Count: 1" })
         XCTAssertTrue(try allNodes(changed).contains { ($0["props"] as? [String: Any])?["testID"] as? String == "detail" })
-        XCTAssertEqual(try session.call("renkuDispatch", argument: button["event"] as! String), changed)
+        XCTAssertEqual(try session.call("renkuDispatch", argument: String(decoding: try JSONSerialization.data(withJSONObject: ["event": button["event"] as! String]), as: UTF8.self)), changed)
     }
 
     func testInvalidBytecodeAndMissingFile() throws {

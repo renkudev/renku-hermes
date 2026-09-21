@@ -48,6 +48,12 @@ public final class HermesSession {
         guard result.success else { throw HermesError.execution(String(result.error)) }
     }
 
+    /// Run promise continuations at a host turn boundary, before reading application state.
+    public func drainMicrotasks() throws {
+        let result = session.drainMicrotasks()
+        guard result.success else { throw HermesError.execution(String(result.error)) }
+    }
+
     public func call(_ function: String, argument: String = "") throws -> String {
         let result = session.call(std.string(function), std.string(argument))
         guard result.success else { throw HermesError.execution(String(result.error)) }
