@@ -32,9 +32,11 @@ import Foundation
 import RenkuHermes
 
 let session = try HermesSession(bytecodeAt: url) // MainActor
-let snapshot = try session.call("renkuMount")
+_ = try session.call("renkuMount")
+try session.drainMicrotasks()
+let initial = try session.call("renkuFlush") // Current snapshot and queued requests
 let event = String(decoding: try JSONEncoder().encode(["event": eventID]), as: UTF8.self)
-let updated = try session.call("renkuDispatch", argument: event)
+_ = try session.call("renkuDispatch", argument: event)
 try session.drainMicrotasks()
 let turn = try session.call("renkuFlush") // Current snapshot and queued requests
 ```
@@ -54,8 +56,8 @@ events and URLSession server-function responses. Timers and downloaded module
 loading remain future additions. Downloadable application assets must target the
 installed runtime contract; this lean runtime does not evaluate browser ESM source.
 
-Set `RENKU_TEST_HBC` to the generated docs app's `app.hbc` when running Swift tests
-to also verify compiled Renku components, signals, events, and structural updates.
+The parent repository's `bun run test:ios` verifies compiled Renku components,
+signals, events, and structural updates through its SwiftUI host and simulator.
 
 ## Local repository workflow
 

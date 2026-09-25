@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import RenkuHermes
+import RenkuHermes
 
 final class HermesRuntimeTests: XCTestCase {
     private func compile(_ source: String) throws -> Data {
@@ -65,28 +65,6 @@ final class HermesRuntimeTests: XCTestCase {
         XCTAssertEqual(try session.call("start"), "pending")
         try session.drainMicrotasks()
         XCTAssertEqual(try session.call("read"), "5")
-    }
-
-    @MainActor
-    func testCompiledRenkuApp() throws {
-        guard let path = ProcessInfo.processInfo.environment["RENKU_TEST_HBC"] else {
-            throw XCTSkip("Set RENKU_TEST_HBC to a generated docs app bundle")
-        }
-        let session = try HermesSession(bytecodeAt: URL(fileURLWithPath: path))
-        let initial = try session.call("renkuMount")
-        func allNodes(_ text: String) throws -> [[String: Any]] {
-            let value = try JSONSerialization.jsonObject(with: Data(text.utf8)) as! [String: Any]
-            func flatten(_ nodes: [[String: Any]]) -> [[String: Any]] {
-                nodes.flatMap { [$0] + flatten($0["children"] as? [[String: Any]] ?? []) }
-            }
-            return flatten(value["nodes"] as! [[String: Any]])
-        }
-        let nodes = try allNodes(initial)
-        let button = nodes.first { ($0["props"] as? [String: Any])?["testID"] as? String == "increment" }!
-        let changed = try session.call("renkuDispatch", argument: String(decoding: try JSONSerialization.data(withJSONObject: ["event": button["event"] as! String]), as: UTF8.self))
-        XCTAssertTrue(try allNodes(changed).contains { $0["text"] as? String == "Count: 1" })
-        XCTAssertTrue(try allNodes(changed).contains { ($0["props"] as? [String: Any])?["testID"] as? String == "detail" })
-        XCTAssertEqual(try session.call("renkuDispatch", argument: String(decoding: try JSONSerialization.data(withJSONObject: ["event": button["event"] as! String]), as: UTF8.self)), changed)
     }
 
     func testInvalidBytecodeAndMissingFile() throws {
